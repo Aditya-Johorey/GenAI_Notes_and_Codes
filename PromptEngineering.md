@@ -1,7 +1,7 @@
 ## Prompt Engineering 📄
 ### Foundations of Prompt Engineering
 **What is a prompt exactly?**
-> A prompt is not a command, it is instructions + contextxt, wrapped with constraints and supported by examples that shape how the model predicts the next token.
+> A prompt is not just a command, it is instructions + context, wrapped with constraints and supported by examples that shape how the model predicts the next token.
 
 LLMS actually dont:
 * Understand the truth
