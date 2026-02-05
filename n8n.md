@@ -1,9 +1,4 @@
 # n8n Complete Teaching Guide (Beginner → Advanced)
-
-**Author:** ChatGPT (Customized for Aditya Johorey)
-**Audience:** Students with no prior automation or backend experience
-**Goal:** Take students from zero → production-ready n8n automation builders, including AI workflows
-
 ---
 
 ## 📌 How to Use This Document
