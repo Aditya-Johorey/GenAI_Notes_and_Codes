@@ -109,3 +109,196 @@ Method | Examples Provided | Best Use Case | Effort Level
 Zero-shot | 0 | "General knowledge, simple instructions." | Low
 One-shot | 1 | Setting a specific tone or basic format. | Medium
 Few-shot | 2-5+ | "Complex patterns, logic, or niche formatting." | High
+
+## Controlling Output Quality
+
+1. Role Prompting (Persona Conditioning)
+    Assigning an identity biases tone, vocabulary, and reasoning style.
+   
+    ```
+    You are a Chartered Accountant.
+    Explain mutual fund risk metrics to a beginner investor.
+    ```
+   
+    This activates patterns associated with:
+    * Finance language
+    * Risk framing
+    * Conservative advice
+      
+2. Constraints and Guardrails
+   Constraints shrink the solution space.
+   * Length constraints
+   * Style constraints
+   * Knowledge constraints
+   * Ethical constraints
+   * Format constraints
+     
+   ```
+   Explain backpropagation in exactly 5 bullet points,
+   each under 15 words, without formulas.
+   ```
+  
+3. Output Formatting & Schema Control
+   You can force machine-readable outputs.
+   ```
+   Return the answer in JSON with keys:
+    "definition", "example", "common_mistake".
+   ```
+
+## Reasoning & Thinking Control
+1. **Chain-of-Thought Prompting (Hidden vs Visible)**
+   Complex problems benefit from intermediate reasoning steps.
+
+   ```
+   Solve step-by-step and explain your reasoning.
+   ```
+
+   This improves:
+   * Accuracy
+   * Logical consistency
+   * Error detection
+
+  In production, we often prefer:
+  
+  ```
+  Solve internally but provide only the final answer.
+  ```
+  Because exposed chain-of-thought can:
+  * Leak reasoning patterns
+  * Be verbose
+  * Be unreliable
+
+2. **Task Decomposition & Stepwise Prompts**
+   
+   Instead of:
+   ```Build a business plan for a robotics startup.```
+
+   Use:
+   ```
+   Step 1: Ask me 5 clarifying questions.
+   Step 2: Generate customer personas.
+   Step 3: Create market analysis.
+   Step 4: Draft business model canvas.
+   ```
+
+   Why this works
+   * Reduces hallucinations
+   * Improves structure
+   * Allows human steering
+
+3. **Self-Consistency Prompting**
+   Ask the model to reason multiple ways and vote.
+
+   ```
+   Solve this problem using three different approaches,
+   then select the most consistent result.
+   ```
+
+   This improves reasoning accuracy on:
+   * Math
+   * Logic
+   * Multi-step planning
+
+## Knowledge Reliability & Hallucination Control
+1. **Hallucinations: Why They Happen**
+
+   LLMs:
+   * Optimize fluency, not truth
+   * Prefer plausible completion over “I don’t know”
+     
+   Causes
+   * Missing data
+   * Ambiguous prompts
+   * Overconfidence bias in training
+
+2. **Reducing Hallucinations**
+
+   * Source Grounding
+
+     ```
+     Answer only using the following document:
+     <<<text>>>
+
+     ```
+   * Refusal Conditioning
+
+     ```
+     If information is missing, say "Insufficient data".
+     ```
+
+   * Citation Forcing
+
+     ```
+     Provide citations for each factual claim.
+     ```
+
+   * Confidence Calibration
+
+     ```
+     Estimate your confidence (0–100%) for each answer.
+     ```
+   
+## Advanced Prompting Patterns
+
+1. Retrieval-Augmented Prompting (RAG)
+   Instead of relying on model memory, inject external documents into the prompt.
+
+   ```
+   System: Use only the context below.
+   Context: [retrieved docs]
+   User: Answer the question.
+   ```
+
+   This turns LLM into:
+   > A reasoning engine over provided data
+   
+   Instead of:
+   > A knowledge oracle
+   
+3. Tool Use Prompting (Function Calling / Agents)
+   Model decides when to call tools.
+
+   ```
+   If calculation is required, call calculator().
+   If web info is required, call search().
+   Otherwise, answer directly.
+   ```
+
+   This enables:
+   * Autonomous agents
+   * Workflow automation
+   * Code execution
+   
+5. Multi-Agent Prompting
+   Different roles debate:
+
+   ```
+   You are three experts:
+   1. Optimist
+   2. Skeptic
+   3. Engineer
+
+   Debate the feasibility of humanoid robots in factories.
+   Then produce a consensus report.
+   ```
+
+   This improves:
+   * Coverage
+   * Risk analysis
+   * Creative solutions
+    
+7. Prompt Chaining & Memory
+   Outputs from one prompt feed another:
+
+   ```
+   Prompt 1 → Outline
+   Prompt 2 → Expand
+   Prompt 3 → Critique
+   Prompt 4 → Final polish
+   ```
+
+   This is how:
+   * Long documents
+   * Reports
+   * Software specs
+   * are generated reliably.
