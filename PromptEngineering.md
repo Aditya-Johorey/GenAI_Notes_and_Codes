@@ -132,7 +132,7 @@ Few-shot | 2-5+ | "Complex patterns, logic, or niche formatting." | High
    * Knowledge constraints
    * Ethical constraints
    * Format constraints
-     
+   * Negative Contraints (do NOT suggest x)
    ```
    Explain backpropagation in exactly 5 bullet points,
    each under 15 words, without formulas.
@@ -145,9 +145,49 @@ Few-shot | 2-5+ | "Complex patterns, logic, or niche formatting." | High
     "definition", "example", "common_mistake".
    ```
 
+4. Few Shot Examples
+5. Positive + Negative Examples:
+   Show what not to do alongside what to do.
+   ```
+   Here's a bad response: [X].
+   Here's a good one: [Y].
+   ```
+   This is particularly useful when the failure mode is subtle (e.g., being too hedgy, using filler phrases, wrong tone).
+6. Sampling / Temperature Hints:
+   While not always exposed in chat interfaces, for API use: lower temperature (0.1–0.3) for factual/deterministic tasks, higher (0.7–1.0) for creative work.        Combined with top_p, this controls output diversity.
+
+   **Temperature:**
+
+   When an LLM predicts the next token, it produces a raw score (logit) for every word in its vocabulary. Temperature divides all those scores before converting     them to probabilities. A low temperature (like 0.1) makes the gap between scores larger, so the top token dominates overwhelmingly. A high temperature (like      1.5) compresses those gaps — lower-ranked tokens catch up — making the output more varied and unpredictable.
+
+   > Think of it like a dial from "always picks the safest word" to "treats all words as roughly equally possible."
+
+   * temperature = 0 → fully deterministic, same output every run
+   * temperature = 0.7 → sensible default for most tasks
+   * temperature > 1 → increasingly chaotic, good for brainstorming, risky for factual tasks
+
+   **top_p(nucleus sampling)**
+   Rather than adjusting probabilities, top_p simply cuts off the long tail. It ranks all tokens by probability, then draws a line so that only the tokens whose     cumulative probability adds up to p are eligible for selection. The rest are zeroed out.
+   
+   * top_p = 0.1 → only the very top token(s) survive (like low temperature, but a hard cut)
+   * top_p = 0.9 → the 90% most likely mass is kept; rare outliers are excluded
+   * top_p = 1.0 → no cutoff, all tokens eligible
+
+**Note:** Iterative Refinement
+Build quality in stages — generate a draft, then prompt to critique it, then prompt to revise. This mirrors how humans produce high-quality work and is especially powerful for writing and code.
+
+
+
 ## Reasoning & Thinking Control
+
+The underlying principle across all of these is the same: LLMs don't "think then speak" — they think by speaking. Every technique here exploits that property, giving the model more tokens of generated context to reason with before committing to a final answer.
+
 1. **Chain-of-Thought Prompting (Hidden vs Visible)**
    Complex problems benefit from intermediate reasoning steps.
+   The simplest and most powerful reasoning technique.
+   Adding "think step by step" to any prompt forces the model to lay out its logic before committing to an answer.
+   This works because LLMs generate text sequentially — once the reasoning is on the "page," it constrains and guides what comes next.
+   Without it, the model jumps straight to an answer token, which may be a pattern-match rather than actual inference.
 
    ```
    Solve step-by-step and explain your reasoning.
@@ -169,6 +209,9 @@ Few-shot | 2-5+ | "Complex patterns, logic, or niche formatting." | High
   * Be unreliable
 
 2. **Task Decomposition & Stepwise Prompts**
+
+   When a task is complex, a single prompt asking for everything at once often produces shallow results across the board.
+   Decomposing into ordered steps — either within one prompt ("First do X, then do Y, do not skip ahead") or across multiple turns — lets the model go deep at       each stage. Each sub-answer also becomes context that improves the next step.
    
    Instead of:
    ```Build a business plan for a robotics startup.```
@@ -186,7 +229,7 @@ Few-shot | 2-5+ | "Complex patterns, logic, or niche formatting." | High
    * Improves structure
    * Allows human steering
 
-3. **Self-Consistency Prompting**
+4. **Self-Consistency Prompting**
    Ask the model to reason multiple ways and vote.
 
    ```
@@ -199,6 +242,142 @@ Few-shot | 2-5+ | "Complex patterns, logic, or niche formatting." | High
    * Logic
    * Multi-step planning
 
+5. **Self-critique and iterative reflection**
+   Generate → critique → revise.
+   After producing a first answer, ask the model to evaluate it: spot weaknesses, rate it, argue against it.
+   Then ask for a revised version. This mimics how experts actually work — rarely is a first draft the final product.
+   It's especially high-leverage for writing, analysis, and code review.
+
+6. **Least-to-most prompting**:
+   Solve the simplest version of a problem first, then layer on complexity. Good for mathematical induction-style problems.
+   
+7. **ReAct (Reason + Act)**
+   An agentic pattern where the model alternates between reasoning and taking actions (tool calls, searches), observing results, then reasoning again. Standard      pattern for AI agents.
+
+   ReAct (Reasoning + Acting) is a prompting framework introduced in a 2022 paper by Yao et al. at Princeton/Google. The key insight is that language models work    far better on real-world tasks when they can interleave reasoning with actions — rather than reasoning in isolation or acting blindly. The model thinks about     what it needs, does something to get it, observes the result, and thinks again.
+
+   The three primitives
+   Every ReAct step is one of three things:
+    
+   Thought — internal monologue. The model reasons about the current state: what it knows, what it's missing, what to do next. This is never sent to any tool;       it only influences the next action.
+   Action — a call to an external tool. This could be a web search, a calculator, a database query, a code interpreter, an API call — anything with a defined        input/output interface.
+   Observation — the tool's response, appended to the context. The model now has new information to reason with.
+    
+   The loop continues until the model's Thought step concludes it has enough to produce a final answer.
+
+   **Why it works better than pure reasoning or pure acting**
+   * Pure chain-of-thought (no tools) hallucinates facts it doesn't know.
+   * Pure tool-use (no reasoning) fires tools randomly and can't integrate results meaningfully.
+   * ReAct combines both: the reasoning step decides which tool to call and why, and the observation updates the reasoning rather than being discarded.
+   
+   <img width="1410" height="642" alt="image" src="https://github.com/user-attachments/assets/4ef8c770-bd12-4dc4-9270-830a5fea8968" />
+
+   <img width="1440" height="1634" alt="image" src="https://github.com/user-attachments/assets/03f498d0-409b-453f-be48-f3174fade43b" />
+
+
+   ```
+   You are an agent that can use tools to answer questions.
+   Tools available:
+      - search(query) → returns web results
+      - calculator(expr) → evaluates a math expression
+    
+   For each step, output:
+      Thought: [your reasoning]
+      Action: [tool call]
+      Observation: [tool result — filled in by the system]
+    
+   When you have enough information, output:
+      Final Answer: [your response]
+    
+   Question: {user_question}
+   ```
+
+   Key limitations to know
+
+   * Context window pressure — each thought-action-observation triple consumes tokens. Long loops can hit the limit.
+   * Error propagation — a bad observation early in the loop can misdirect all subsequent reasoning.
+   * No backtracking — standard ReAct is linear; it can't undo a mistaken action. Extensions like Tree of Thoughts add branching.
+   * Tool quality is a ceiling — the agent is only as good as the tools it can call.
+
+
+9. **Constraint-first reasoning**
+   List all rules and boundaries before reasoning. Forces the model into a bounded solution space rather than letting it freewheel.
+10. **Socratic prompting:**
+    The name comes from Socrates, the Athenian philosopher whose method of teaching was to ask relentless questions rather than lecture.
+    He believed that people already hold the seeds of knowledge inside them — the teacher's job is to draw it out through dialogue.
+    Applied to LLMs, it means instructing the model to guide through questions rather than answer directly.
+    
+   Instead of stating the problem, lead the model through guided questions. 
+   Useful for educational applications or when you want the model to discover an answer rather than be told it.
+
+   The key insight is that **the act of answering a question changes how you think — more than being told the answer does.** 
+   When the model asks "where is count being modified?", you trace the variable yourself. 
+   That tracing is the learning. 
+   Being told "your increment is in an unreachable branch" skips the tracing entirely and produces only surface-level understanding.
+
+   **When to use it vs. when not to:**
+  Socratic prompting is the right choice when the goal is learning, decision quality, or eliciting the user's own reasoning. It is the wrong choice when the user   just needs a fast, accurate answer — "what's the capital of France?" should not be met with "what do you already know about European capitals?". The technique    only has value when the process of getting to the answer matters as much as the answer itself.
+
+  **Prompt Patterns that trigger this bahaviour:**
+  ```
+    "Before answering, ask me one question to understand my goal."
+
+    "Don't tell me the answer — guide me to it with questions."
+
+    "Ask me what I already know about X before explaining it."
+
+    "After I respond, challenge any assumptions I'm making."
+
+    "Once I've solved this, ask me to reflect on what I learned."
+  ```
+   
+
+<img width="1410" height="642" alt="image" src="https://github.com/user-attachments/assets/f0f583e9-3b9b-42d7-a6bd-c437ea557044" />
+
+**The core difference:** direct prompting transfers information, Socratic prompting constructs understanding through guided questions.
+
+5 distinct Modes: 
+1) Clarifying:
+   Objective to surface what the user actually needs. This prevents the classic failure mode of answering a well-formed question that isn't the real question.
+
+   <img width="1440" height="1472" alt="image" src="https://github.com/user-attachments/assets/f7b8d3d5-af4e-440d-8b11-c2ad866aa50a" />
+
+   planning a birthday party. You said "help me plan a party" but that could mean a hundred different things. Two quick questions (who is it for, how many           guests) made the answer ten times more useful than any generic response would have been.
+
+   
+3) Guided Discovery:
+   The model never gives the answer, it only asks questions that narrow the user's thinking one step at a time until they arrive themselves. Powerful for            debugging, maths, and logic.
+
+   <img width="1440" height="1712" alt="image" src="https://github.com/user-attachments/assets/d1ca5abe-86c8-46ef-94e8-dd20c806689e" />
+
+   deciding whether to quit a job. The model never told you what to do. Instead, questions like "how long have you felt this?" and "what does staying feel like      versus leaving?" led you to arrive at your own clarity. You own that conclusion because you reached it yourself.
+
+   
+5) Challenging Assumptions:
+   Targets the premises behind a claim or decision. The model doesn't argue — it just asks what supports the belief. "Have you actually measured that?" is more      effective than "That's wrong."
+
+   <img width="1440" height="1554" alt="image" src="https://github.com/user-attachments/assets/32ea1e87-7fa4-4fb0-801e-92828871a643" />
+
+   Moving to a new city. You had a feeling ("life will be better there") built on a one-week visit. The model didn't argue. It just asked what "better" would        actually look like day-to-day, and that question revealed the plan had no foundation yet. That's far more useful than either agreeing or disagreeing.
+
+   
+7) Concept Building:
+   Checks what the user already knows before layering in new ideas. This avoids the over-explanation trap (wasting time on things they know) and under-              explanation trap (jumping past their gap).
+
+   <img width="1440" height="1592" alt="image" src="https://github.com/user-attachments/assets/6b4323ef-be98-429c-b9d6-580ea5f7e7ee" />
+
+   Understanding a bank loan. Before explaining interest rates and EMI, the model asked what you already understand about borrowing from a friend. It then built     the entire explanation on that foundation. No jargon until the concept clicked at the simple level first.
+
+   
+9) Reflection:
+   Happens after a task — asking the user to articulate what happened and why. This consolidates a solved problem into a transferable principle. One good            reflection question after debugging is worth more than three debugging sessions.
+
+   <img width="1440" height="1550" alt="image" src="https://github.com/user-attachments/assets/19e23bdd-2d58-4554-9697-5bb5563b81bb" />
+
+   After resolving a family argument. The hard work was done — the argument was over. But the model asked questions that made you extract the principle: "do I       want to be right, or do I want this relationship?" That's a phrase you'll carry into the next conflict. One conversation turned into a lasting mental tool.
+
+   
+    
 ## Knowledge Reliability & Hallucination Control
 1. **Hallucinations: Why They Happen**
 
