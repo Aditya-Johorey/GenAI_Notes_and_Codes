@@ -95,11 +95,12 @@ Instead of:
 
 > "Write a program"
 
-Think:
+### Practical Tips for Non-Tech Professionals
 
-> "What happens when X occurs?"
-
----
+> * Start with a single repetitive task — pick one thing you do every week and automate it first
+> * Use templates — Make, Zapier, and Voiceflow all have libraries of pre-built templates
+> * Think in "triggers and actions" — When X happens → do Y with AI is the mental model for all these tools
+> * Use Claude/ChatGPT to help you build — describe what you want in plain English and ask it to guide you step by step through any of these platforms
 
 ## 1.4 Where n8n is Used
 
