@@ -69,6 +69,8 @@ docker cp file.txt my_container:/app/file.txt
 docker run -v /local/folder:/container/folder image_name
 ```
 
+The only accecible path on the container is `/home/node/.n8n-files/`, please use this container path to trasfer your files from the disk
+
 Example:
 
 ```
