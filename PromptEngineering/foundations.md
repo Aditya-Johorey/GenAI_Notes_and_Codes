@@ -115,3 +115,63 @@ Strong tasks include:
 - A specific deliverable (a subject line, a function, a plan)
 
 _**One task per prompt is a useful rule of thumb. When you give the model two tasks in one prompt, it often underperforms on both. Break complex goals into sequential prompts.**_
+
+### Context
+> Context provides the background information the model needs to understand **why the task matters** and _**who it's for**_.
+
+```
+Context: I am presenting to a board of non-technical executives who
+have no AI background. They are skeptical of automation initiatives.
+```
+
+#### Context controls:
+
+- **Audience calibration** — who will read this output?
+- **Situational relevance** — what constraints exist in the real world?
+- **Stakes** — is this a casual blog post or a legal document?
+- **Prior knowledge** — what does the audience already know?
+
+#### The hallucination connection
+> Many AI hallucinations happen not because the model lacks knowledge, but because the model lacks context and invents a plausible scenario.
+
+**Providing context grounds the model in your specific situation and dramatically reduces invented content.**
+
+#### What should context section contain?
+A good context section answers:
+
+- Who is the intended audience?
+- What is the purpose of this output?
+- What situation is this being used in?
+- What does the reader already know?
+
+### Constraints
+> Constraints tell the model what it must not do, or strict limits it must stay within. They shrink the solution space.
+
+```
+Constraints:
+- Maximum 200 words
+- No bullet points
+- Do not use technical jargon
+- Do not recommend specific products
+```
+
+#### Why constraints are important?
+Without constraints, the model optimizes for completeness and fluency — which often means verbose, over-explained output full of hedges and caveats. Constraints force it to make choices, which produces tighter, more useful outputs.
+
+During pretraining, the model read vast amounts of human writing — articles, essays, textbooks, forum answers. The pattern in most of that writing is: say more, cover all angles, hedge your claims, don't leave things out. That is what "good writing" looked like in the training data. THe model has been trained to cover all the knowledge gaps and give a complete outlook on a topic.
+
+So when you give the model a task with no constraints, it defaults to that pattern. It writes the way a cautious, thorough writer would:
+
+- It adds phrases like "it's worth noting that..." and "however, it depends on..."
+- It covers edge cases you didn't ask about
+- It qualifies every claim with "generally speaking" or "in most cases"
+- It wraps up with a summary paragraph restating everything it just said
+
+None of this is wrong — it's just the model doing what got rewarded in training: produce fluent, complete-sounding text.
+
+**Constraints break this default.** When you say "under 80 words", the model cannot pad. It is forced to decide what actually matters and cut everything else. When you say "no caveats", it cannot hedge. It has to commit.
+
+Think of it like this — if you ask someone "explain machine learning" with no limits, they'll talk for ten minutes covering everything. If you say "explain it in two sentences to a 10-year-old", they're forced to find the sharpest possible version of the idea.
+
+_**Constraints don't restrict quality. They force prioritization — which is where quality actually comes from.**_
+
