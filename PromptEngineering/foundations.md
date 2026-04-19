@@ -274,3 +274,177 @@ Every component is pulling its weight here:
 
 Categorising Prompts on the Basis of Iterations
 -
+
+When you write a prompt, you have a choice: explain what you want in words, or show the model what you want through examples.
+
+The number of examples you provide defines the type of prompting you are doing — and that choice has a direct impact on output quality and consistency.
+This is not about how many times you run the prompt. It is about how many examples you include inside the prompt itself before asking the model to do the actual task.
+
+Think of it like teaching someone a new task:
+
+- You could describe the task and hope they get it
+- You could show them one example and then ask them to try
+- You could walk them through several examples before handing it over
+
+### Zero-Shot Prompting
+> Zero-shot prompting means giving the model a task with no examples at all. You describe what you want and trust the model to figure out the rest from its training.
+
+```
+Classify the sentiment of this sentence as Positive, Negative, or Neutral.
+
+Sentence: "The delivery was late but the product itself was great."
+```
+The model has seen enough sentiment classification during pretraining that it can handle this without examples. No demonstration needed.
+
+When it works well:
+
+- Tasks the model has seen countless times in training — summarization, translation, basic classification, brainstorming
+- When the output format is simple and universally understood
+- When speed matters and you do not have time to craft examples
+- Early exploration — when you are figuring out what the model can do
+
+When it breaks down:
+
+- Niche or specialized tasks the model has little training exposure to
+- When you have a very specific output style or structure in mind
+- When the task involves subtle judgment calls the model cannot infer
+- When consistency across many runs matters
+
+**The hidden risk of zero-shot:** The model fills every gap with its own assumptions. If those assumptions match yours, great. If they do not, you get output that is **technically correct** but **not what you wanted** — and **you may not even realize why.**
+
+### One-Shot Prompting
+> One-shot prompting gives the model exactly one example before the real task. That single example communicates format, tone, depth, and style far more efficiently than a paragraph of instructions.
+
+```
+Convert the following customer complaint into a calm, professional
+support response.
+
+Example:
+Complaint: "Your app crashed and I lost three hours of work. This is unacceptable."
+Response: "We're truly sorry to hear about your experience. Losing work due to
+an unexpected crash is incredibly frustrating, and we understand how serious
+this is. Our team is actively investigating this issue. In the meantime, please
+reach out to support@company.com and we'll make this right."
+
+Now do the same for:
+Complaint: "I've been waiting two weeks for a refund and nobody is responding to my emails."
+Response:
+```
+
+One example showed the model:
+
+- The tone (calm, empathetic, not defensive)
+- The structure (acknowledge → validate → action → resolution)
+The length (three sentences approximately)
+- The vocabulary (professional but human)
+
+None of that was explained in words. The example communicated it all implicitly.
+
+**When it works well:**
+
+- You have a specific voice or format that is hard to describe in words
+- The task involves stylistic judgment — tone, register, personality
+- You want consistent output across many inputs
+- The task is simple enough that one demonstration is sufficient
+
+**When it breaks down:**
+
+- The task has multiple distinct patterns or edge cases one example cannot cover
+- The example you choose is unrepresentative — the model overfits to it
+- The task requires the model to understand a rule, not just copy a pattern
+
+**The one-shot trap:** If your single example has any quirk — an unusual word, an unexpected structure — the model may treat that quirk as intentional and replicate it everywhere. Choose your example carefully.
+
+### Few Shot Prompting
+> Few-shot prompting provides multiple examples — typically between two and five — before the real task. Each additional example teaches the model something new: a pattern, an edge case, a boundary condition.
+
+```
+Role: You are a support operations specialist.
+Task: Classify each incoming ticket by Category and Priority (1-5).
+
+Priority guide:
+- Priority 5: System is completely down, users cannot work
+- Priority 3: Feature broken, but a workaround exists
+- Priority 1: Cosmetic feedback or minor suggestions
+
+---
+Input: "I love the new dashboard design! Could you add a dark mode option?"
+Output: Category: Feature Request | Priority: 1 | Reason: Cosmetic improvement, no workflow impact.
+
+---
+Input: "The export to PDF button is greyed out. I need it for a client meeting
+in an hour — I'm copy-pasting for now."
+Output: Category: Functional Bug | Priority: 3 | Reason: Feature broken but workaround exists.
+
+---
+Input: "URGENT — our entire team gets a 404 when trying to log in.
+Nobody can access the system."
+Output: Category: Critical Outage | Priority: 5 | Reason: Complete loss of access for all users.
+
+---
+Input: "Hi, I tried resetting my password but the link in the email just
+loads a blank white page. I've tried three times."
+Output:
+```
+
+Three examples taught the model:
+
+- What Priority 1 looks like in practice
+- What Priority 3 looks like in practice
+- What Priority 5 looks like in practice
+- The exact output format to use every time
+- How to write a one-line reason
+
+**When it works well:**
+
+- Complex classification or labeling tasks with multiple categories
+- Tasks where the pattern is subtle and hard to explain in words
+- When output consistency across many runs is critical
+- Niche or domain-specific tasks the model has less training exposure to
+- When you need to teach the model a custom logic or rubric
+
+**When it breaks down:**
+
+- Your examples are inconsistent with each other — the model gets confused about what the rule actually is
+- You use too many examples and bloat the prompt unnecessarily — two good examples beat five mediocre ones
+- The examples do not cover the edge cases that actually appear in production
+
+**Choosing the Right Approach**
+The decision is not always obvious. Here is a practical framework:
+
+- Start with zero-shot. If the output is good enough, stop there. Adding examples costs tokens and time.
+- Move to one-shot when zero-shot output has the right content but the wrong format, tone, or structure. One example is usually enough to fix stylistic problems.
+- Move to few-shot when one-shot is inconsistent — when different inputs produce structurally different outputs, or when the task has multiple distinct cases the model needs to distinguish between.
+
+#### The Quality of Examples Matters More Than the Quantity**
+
+A common mistake is thinking more examples automatically means better output. It does not. Three well-chosen examples that each demonstrate something different will outperform six examples that all show the same pattern.
+
+When selecting examples for few-shot prompts, ask:
+
+- Does each example teach the model something the others do not?
+- Do my examples cover the range of inputs the model will actually see?
+- Are my examples consistent with each other — do they all follow the same underlying rule?
+- Would a human, reading only these examples, understand exactly what I want?
+
+If the answer to all four is yes, your examples are ready.
+
+#### Positive and Negative Examples Together
+
+One underused technique is pairing a good example with a bad one and explaining the difference. This is especially effective when the failure mode is subtle.
+
+```
+Good output: "Revenue increased 14% year-over-year, driven primarily
+by enterprise subscriptions."
+
+Bad output: "Revenue went up a lot this year, which is really exciting
+for the whole team!"
+
+The good output cites specific figures and stays objective.
+The bad output is vague and adds unnecessary emotional commentary.
+
+Now summarize the following financial result in the same style as
+the good output:
+```
+
+Showing what to avoid, alongside what to aim for, closes the gap between your intent and the model's interpretation far more effectively than words alone.
