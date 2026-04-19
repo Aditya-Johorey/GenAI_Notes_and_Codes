@@ -155,6 +155,15 @@ Constraints:
 - Do not recommend specific products
 ```
 
+Type | Example
+--- | ---
+Length | "Under 100 words", "exactly 5 bullet points"
+Style | "Formal tone", "conversational, no jargon"
+Format | "Only plain text, no markdown"
+Knowledge | "Do not reference events after 2023"
+Ethical | "Do not make claims about competitor products"
+Negative | "Do not suggest surgery as a first option"
+
 #### Why constraints are important?
 Without constraints, the model optimizes for completeness and fluency — which often means verbose, over-explained output full of hedges and caveats. Constraints force it to make choices, which produces tighter, more useful outputs.
 
@@ -173,5 +182,95 @@ None of this is wrong — it's just the model doing what got rewarded in trainin
 
 Think of it like this — if you ask someone "explain machine learning" with no limits, they'll talk for ten minutes covering everything. If you say "explain it in two sentences to a 10-year-old", they're forced to find the sharpest possible version of the idea.
 
+**Negative constraints (what not to do)** are often more powerful than positive ones. Telling the model to avoid a specific failure mode directly prevents that failure, whereas hoping it won't happen without instruction is unreliable.
+
 _**Constraints don't restrict quality. They force prioritization — which is where quality actually comes from.**_
 
+### Examples
+> Examples are the single most powerful lever for controlling output quality. Showing the model what good output looks like is more effective than describing it.
+
+```
+Here is the format I want:
+
+Product: AirPods Pro
+Review: "Excellent noise cancellation, but the case scratches easily."
+Sentiment: Mixed
+Key issue: Durability
+
+Now do the same for: [new review]
+```
+
+Examples work because the model is a **pattern-completion engine**. When you **show it a pattern, it extends that pattern**. This is more reliable than explaining the pattern in words, because the model may interpret your words differently than you intend.
+
+```
+Positive and negative examples together are especially powerful:
+Good response: "Based on the data, sales increased 12% in Q3."
+Bad response: "Sales went up a lot recently, which is great!"
+
+The good response cites specific figures. The bad one is vague and adds unnecessary enthusiasm.
+```
+
+Showing what to avoid alongside what to produce dramatically reduces the chance of the model drifting toward the bad pattern.
+
+### Output Format
+> The output format defines the structure of the response.
+This is especially important when the output will be used programmatically — fed into another system, parsed by code, or inserted into a document.
+
+```
+Return your answer as a JSON object with exactly these keys:
+{
+  "summary": "...",
+  "risk_level": "low | medium | high",
+  "recommended_action": "..."
+}
+```
+
+Output format controls:
+
+- Structure — prose, JSON, markdown, table, numbered list
+- Length — word count, number of items, number of paragraphs
+- Order — which sections come first
+- Completeness — must all fields be filled in?
+
+When building AI-powered applications or automations, the output format is not optional — it is what makes the output machine-readable.
+
+### Putting It Together: A Complete Prompt
+Here is what these six components look like assembled into a real prompt:
+```
+Role:
+You are an enthusiastic startup coach who specializes in helping
+first-time founders find clarity and confidence in their ideas.
+
+Task:
+Write a motivational one-page business pitch for a young founder
+who wants to launch a sustainable water bottle brand.
+
+Context:
+The founder is 22 years old, just graduated, has no funding yet,
+but has a clear passion for reducing single-use plastic waste.
+The pitch will be shared with potential angel investors at a
+casual networking event — not a formal boardroom setting.
+
+Constraints:
+- Maximum 200 words
+- Energetic and optimistic tone
+- No corporate jargon
+- Do not mention lack of funding or experience as weaknesses
+- Focus on vision and impact, not financials
+
+Output format:
+Plain text with three short sections:
+1. The Problem
+2. The Vision
+3. The Ask
+```
+
+Every component is pulling its weight here:
+- The role sets an encouraging, coaching energy. 
+- The task is specific — one page, one brand, one founder. 
+- The context tells the model exactly who this person is and where the pitch lands. 
+- The constraints prevent the model from defaulting to cautious, hedge-heavy business writing. 
+- The output format locks in a clean three-part structure so the output is immediately usable.
+
+Categorising Prompts on the Basis of Iterations
+-
