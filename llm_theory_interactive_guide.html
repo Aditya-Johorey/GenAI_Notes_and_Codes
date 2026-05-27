@@ -1,0 +1,705 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 1rem 0 1.5rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+  .nav-btn { font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; font-family: var(--font-sans); }
+  .nav-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .nav-btn.active { background: var(--color-background-primary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+  
+  .section { display: none; }
+  .section.active { display: block; }
+  
+  .hero { padding: 1.5rem; background: var(--color-background-secondary); border-radius: var(--border-radius-lg); margin-bottom: 1.5rem; }
+  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 6px; }
+  .hero-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .hero-sub { font-size: 15px; color: var(--color-text-secondary); line-height: 1.6; }
+  
+  .analogy-box { border-left: 2px solid #7F77DD; padding: 12px 16px; margin: 1rem 0; background: var(--color-background-secondary); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+  .analogy-label { font-size: 11px; font-weight: 500; color: #534AB7; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .analogy-text { font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; }
+  
+  .concept-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .concept-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .concept-body { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; }
+  
+  .tag { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 500; margin-right: 4px; }
+  .tag-purple { background: #EEEDFE; color: #3C3489; }
+  .tag-teal { background: #E1F5EE; color: #085041; }
+  .tag-coral { background: #FAECE7; color: #712B13; }
+  .tag-amber { background: #FAEEDA; color: #633806; }
+  .tag-blue { background: #E6F1FB; color: #0C447C; }
+  
+  .token-demo { display: flex; flex-wrap: wrap; gap: 6px; margin: 1rem 0; }
+  .token { display: inline-flex; align-items: center; justify-content: center; padding: 6px 12px; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; border: 0.5px solid; }
+  .token-1 { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .token-2 { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+  .token-3 { background: #FAECE7; color: #712B13; border-color: #F0997B; }
+  .token-4 { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+  .token-5 { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+  
+  .interactive-area { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin: 1rem 0; }
+  .interactive-label { font-size: 12px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; letter-spacing: 0.05em; text-transform: uppercase; }
+  
+  .prob-bar-wrap { margin: 6px 0; display: flex; align-items: center; gap: 10px; }
+  .prob-word { font-size: 13px; font-weight: 500; color: var(--color-text-primary); min-width: 70px; }
+  .prob-bar-bg { flex: 1; height: 8px; background: var(--color-background-primary); border-radius: 4px; overflow: hidden; border: 0.5px solid var(--color-border-tertiary); }
+  .prob-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+  .prob-pct { font-size: 12px; color: var(--color-text-secondary); min-width: 36px; text-align: right; }
+  
+  .pipeline-step { display: flex; gap: 12px; padding: 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); margin-bottom: 8px; background: var(--color-background-primary); transition: border-color 0.2s; }
+  .pipeline-step:hover { border-color: var(--color-border-secondary); }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .step-content { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .step-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+  
+  .phase-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+  .phase-card { flex: 1; padding: 1rem; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+  .phase-icon { font-size: 18px; margin-bottom: 6px; }
+  .phase-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .phase-sub { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  
+  .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 1rem 0; }
+  .compare-card { padding: 1rem; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+  .compare-head { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .compare-row { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .compare-val { font-weight: 500; color: var(--color-text-primary); }
+  
+  .temp-demo { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .temp-word { padding: 4px 10px; border-radius: 12px; font-size: 13px; border: 0.5px solid; transition: all 0.3s; }
+  
+  .hallucination-ex { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; margin: 10px 0; }
+  .hal-prompt { font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 6px; }
+  .hal-real { font-size: 13px; color: #0F6E56; background: #E1F5EE; display: inline-block; padding: 2px 8px; border-radius: 4px; margin-bottom: 4px; }
+  .hal-fake { font-size: 13px; color: #993C1D; background: #FAECE7; display: inline-block; padding: 2px 8px; border-radius: 4px; }
+  
+  .divider { height: 0.5px; background: var(--color-border-tertiary); margin: 1.5rem 0; }
+  
+  .sendprompt-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; font-family: var(--font-sans); margin-top: 8px; transition: all 0.15s; }
+  .sendprompt-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } .phase-row { flex-direction: column; } }
+  
+  .stat-row { display: flex; gap: 10px; margin: 1rem 0; }
+  .stat-card { flex: 1; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .stat-label { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+  
+  input[type=range] { width: 100%; }
+  input[type=text] { width: 100%; font-size: 14px; padding: 8px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); }
+  input[type=text]:focus { outline: none; border-color: var(--color-border-primary); }
+</style>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">Interactive guide to large language model theory, covering core concepts from tokens to training to RAG</h2>
+
+<div class="nav" id="nav">
+  <button class="nav-btn active" onclick="showSection('what')">What is an LLM?</button>
+  <button class="nav-btn" onclick="showSection('tokens')">Tokens</button>
+  <button class="nav-btn" onclick="showSection('probability')">Probability & Sampling</button>
+  <button class="nav-btn" onclick="showSection('training')">Training</button>
+  <button class="nav-btn" onclick="showSection('context')">Context & Memory</button>
+  <button class="nav-btn" onclick="showSection('rag')">RAG</button>
+  <button class="nav-btn" onclick="showSection('agents')">Agents & Tools</button>
+  <button class="nav-btn" onclick="showSection('ethics')">Bias & Ethics</button>
+</div>
+
+<!-- SECTION: WHAT IS AN LLM -->
+<div class="section active" id="sec-what">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 1</div>
+    <div class="hero-title">What is a Large Language Model?</div>
+    <div class="hero-sub">A probabilistic system trained to predict the next word by finding patterns in enormous amounts of human text.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">For creative minds</div>
+    <div class="analogy-text">Imagine you've read every book, article, and website ever written. Now someone gives you the start of a sentence, and you complete it using instinct built from all that reading. That's roughly how an LLM works — except the "instinct" is millions of mathematical patterns, not lived experience.</div>
+  </div>
+
+  <div class="analogy-box" style="border-color: #1D9E75;">
+    <div class="analogy-label" style="color: #0F6E56;">For business/non-tech minds</div>
+    <div class="analogy-text">Think of it like a very sophisticated autocomplete system trained on the entire internet. It doesn't "know" things the way humans do. It recognises what words statistically tend to follow other words — at an extraordinary scale and nuance.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Common Misconceptions</div>
+  <div class="grid-2">
+    <div class="concept-card">
+      <div class="concept-title">LLMs are not search engines</div>
+      <div class="concept-body">Search engines retrieve existing pages. LLMs generate entirely new text based on patterns. They don't "look things up" unless specifically connected to a retrieval system.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">LLMs are not thinking beings</div>
+      <div class="concept-body">There is no understanding, intention, or consciousness. The model is performing sophisticated pattern matching at massive scale — like a very complex mirror of human language.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">LLMs are not databases</div>
+      <div class="concept-body">They don't store facts in retrievable slots. Knowledge is distributed across billions of numerical weights — fuzzily encoded, not sharply indexed like a spreadsheet.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">LLMs are not deterministic</div>
+      <div class="concept-body">Ask the same question twice and you may get different answers. Randomness is built in by design — it's what makes them feel natural rather than robotic.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.7;">The "Large" in LLM refers to the number of <strong style="font-weight:500; color: var(--color-text-primary);">parameters</strong> — numerical weights the model learns during training. GPT-4 is estimated to have over a trillion parameters. More parameters generally means more nuanced pattern recognition, at the cost of enormous compute.</div>
+  <button class="sendprompt-btn" onclick="sendPrompt('Can you explain what parameters are in an LLM using a simple real-world analogy?')">What exactly is a parameter? ↗</button>
+</div>
+
+<!-- SECTION: TOKENS -->
+<div class="section" id="sec-tokens">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 2</div>
+    <div class="hero-title">Tokens — The LLM's alphabet</div>
+    <div class="hero-sub">LLMs don't read letters or words. They read tokens — chunks of text that could be a word, part of a word, or a punctuation mark.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">Analogy</div>
+    <div class="analogy-text">Imagine reading music. You don't read individual notes AND full songs at once — you read measures. Tokens are the "measures" of language: bigger than single characters, smaller than sentences, sized to be efficient.</div>
+  </div>
+
+  <div class="interactive-area">
+    <div class="interactive-label">Try it — type a word or phrase</div>
+    <input type="text" id="tokenInput" value="Tokenization is fascinating" oninput="updateTokens()" placeholder="Type something..." />
+    <div id="tokenDisplay" class="token-demo" style="margin-top: 12px;"></div>
+    <div id="tokenCount" style="font-size: 12px; color: var(--color-text-tertiary); margin-top: 6px;"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Why tokens matter in practice</div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num">~¾</div><div class="stat-label">word per token (average)</div></div>
+    <div class="stat-card"><div class="stat-num">4k</div><div class="stat-label">tokens ≈ 3,000 words</div></div>
+    <div class="stat-card"><div class="stat-num">128k+</div><div class="stat-label">context window in modern models</div></div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-title">Cost</div>
+    <div class="concept-body">Most AI APIs charge per token — both what you send (input) and what the model writes back (output). Longer prompts cost more. Concise, well-scoped prompts are not just good style — they're economical.</div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-title">Context window limit</div>
+    <div class="concept-body">Every model has a maximum number of tokens it can hold in "working memory" at once. Once exceeded, older text is silently dropped. For a long conversation, the model may literally forget what was said at the start.</div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-title">Tokenization differences across languages</div>
+    <div class="concept-body">English words often tokenize efficiently. But languages like Arabic, Hindi, or Chinese can require more tokens per concept, making them effectively more expensive and sometimes less fluent. This is an active area of improvement in model design.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Three types of tokenization</div>
+  <div id="tokenType" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+    <button class="nav-btn active" onclick="showTokenType('word', this)">Word-based</button>
+    <button class="nav-btn" onclick="showTokenType('char', this)">Character-based</button>
+    <button class="nav-btn" onclick="showTokenType('sub', this)">Subword (modern)</button>
+  </div>
+  <div id="tokenTypeContent" class="concept-card"></div>
+</div>
+
+<!-- SECTION: PROBABILITY -->
+<div class="section" id="sec-probability">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 3</div>
+    <div class="hero-title">Probability, Logits & Hallucination</div>
+    <div class="hero-sub">Every word the model generates is a weighted gamble over thousands of possible next tokens.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">Analogy</div>
+    <div class="analogy-text">Imagine a game show where you must finish sentences. You're shown "The capital of France is..." and asked to press a buzzer for your answer. A person who's read a lot would buzz "Paris" immediately. An LLM computes the probability of every word in its vocabulary being next — and picks from the highest-ranked ones.</div>
+  </div>
+
+  <div class="interactive-area">
+    <div class="interactive-label">Probability distribution visualiser</div>
+    <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 12px;">Prompt: <em style="color: var(--color-text-primary);">"The sky is..."</em></div>
+    <div id="probBars"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Controlling creativity: Temperature</div>
+
+  <div class="interactive-area">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+      <label style="font-size:13px; color:var(--color-text-secondary); min-width:80px;">Temperature</label>
+      <input type="range" min="1" max="10" value="5" id="tempSlider" oninput="updateTemp()" />
+      <span id="tempVal" style="font-size:14px; font-weight:500; min-width:30px;">0.5</span>
+    </div>
+    <div class="interactive-label" style="margin-bottom:6px;">Likely next words for "The meeting was..."</div>
+    <div id="tempWords" class="temp-demo"></div>
+    <div id="tempDesc" style="font-size:13px; color:var(--color-text-secondary); margin-top:10px; line-height:1.5;"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Hallucinations</div>
+
+  <div class="concept-card">
+    <div class="concept-title">What is a hallucination?</div>
+    <div class="concept-body">When the model generates text that is confident, fluent, and factually wrong. It isn't "lying" — it has no intent. It's producing statistically plausible sequences that happen to be false. A hallucination is the model's pattern-matching outrunning its accuracy.</div>
+  </div>
+
+  <div class="hallucination-ex">
+    <div class="hal-prompt">Prompt: "Who wrote the novel Midnight Rain?"</div>
+    <div style="margin-top:6px;">
+      <span class="hal-real">Real: No widely known novel by this name exists</span><br/><br/>
+      <span class="hal-fake">Hallucinated: "Midnight Rain was written by Elena Vasquez in 1987 and won the Booker Prize..."</span>
+    </div>
+    <div style="font-size:12px; color:var(--color-text-tertiary); margin-top:8px;">Completely invented — author, year, prize — but delivered with full confidence.</div>
+  </div>
+
+  <div class="concept-card" style="margin-top:10px;">
+    <div class="concept-title">Why it happens</div>
+    <div class="concept-body">Patterns like "author X wrote novel Y in year Z and won award W" appear frequently in training data. The model learns the shape of that sentence so well it fills it in even when the specific facts don't exist. This is the core tension in LLMs: fluency does not equal accuracy.</div>
+  </div>
+
+  <button class="sendprompt-btn" onclick="sendPrompt('What are practical strategies to reduce LLM hallucinations in a production system?')">How do we reduce hallucinations? ↗</button>
+</div>
+
+<!-- SECTION: TRAINING -->
+<div class="section" id="sec-training">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 4</div>
+    <div class="hero-title">How LLMs are trained</div>
+    <div class="hero-sub">Training happens in three distinct phases — each one builds on the last, like taking a language prodigy from childhood to working professional.</div>
+  </div>
+
+  <div class="phase-row">
+    <div class="phase-card">
+      <div style="font-size:16px; margin-bottom:6px;">1 — Pretraining</div>
+      <div class="phase-sub">Reading the entire internet. Learning language patterns, facts, and logic from trillions of tokens. Extremely expensive. Done by large AI labs.</div>
+      <div style="margin-top:8px;"><span class="tag tag-coral">Unsupervised</span><span class="tag tag-amber">Months of compute</span></div>
+    </div>
+    <div class="phase-card">
+      <div style="font-size:16px; margin-bottom:6px;">2 — Fine-tuning</div>
+      <div class="phase-sub">Narrowing the model to specific behaviours or domains. Teaching it to follow instructions. Done with curated, labelled datasets.</div>
+      <div style="margin-top:8px;"><span class="tag tag-purple">Supervised</span><span class="tag tag-blue">Days to weeks</span></div>
+    </div>
+    <div class="phase-card">
+      <div style="font-size:16px; margin-bottom:6px;">3 — RLHF</div>
+      <div class="phase-sub">Human trainers rank responses. A "reward model" learns human preferences. The main model is nudged toward being more helpful, honest, and safe.</div>
+      <div style="margin-top:8px;"><span class="tag tag-teal">Reinforcement</span><span class="tag tag-amber">Ongoing</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">The Pretraining process — step by step</div>
+
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#EEEDFE; color:#3C3489;">1</div>
+    <div class="step-content">
+      <div class="step-title">Data collection</div>
+      <div class="step-desc">Trillions of words are scraped from Common Crawl (the web), Wikipedia, books, academic papers, code repositories, and more. Quality filtering removes spam, duplicates, and harmful content.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E1F5EE; color:#0F6E56;">2</div>
+    <div class="step-content">
+      <div class="step-title">Tokenisation</div>
+      <div class="step-desc">All text is converted to sequences of integer IDs that the neural network can process.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#FAECE7; color:#712B13;">3</div>
+    <div class="step-content">
+      <div class="step-title">Forward pass</div>
+      <div class="step-desc">The model reads a sequence and predicts the next token. Its prediction is compared to the actual next token. The difference is the "loss" — a measure of how wrong it was.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E6F1FB; color:#0C447C;">4</div>
+    <div class="step-content">
+      <div class="step-title">Backpropagation</div>
+      <div class="step-desc">The loss signal is propagated backwards through the network. Each parameter (weight) is nudged slightly in the direction that would have reduced the error. This is gradient descent.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#FAEEDA; color:#633806;">5</div>
+    <div class="step-content">
+      <div class="step-title">Repeat — billions of times</div>
+      <div class="step-desc">This process runs across entire datasets, for weeks or months, on thousands of specialised chips (GPUs/TPUs). The cumulative tiny adjustments produce a model that has effectively "absorbed" the statistical structure of human language.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">LoRA — the efficient shortcut</div>
+  <div class="concept-card">
+    <div class="concept-title">Low-Rank Adaptation (LoRA)</div>
+    <div class="concept-body">Full pretraining costs millions of dollars. LoRA is a clever shortcut: instead of retraining all billions of parameters, you freeze the base model and train a tiny "adapter layer" on top — as little as 0.01% of total parameters. It's like giving a world-class generalist chef a specialised menu card, rather than re-training them from culinary school.</div>
+  </div>
+
+  <div class="divider"></div>
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Comparison at a glance</div>
+  <div class="compare-grid">
+    <div class="compare-card">
+      <div class="compare-head">Pretraining</div>
+      <div class="compare-row"><span>Who</span><span class="compare-val">AI Labs</span></div>
+      <div class="compare-row"><span>Cost</span><span class="compare-val">$$$M</span></div>
+      <div class="compare-row"><span>Goal</span><span class="compare-val">Learn language</span></div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-head">Fine-tuning</div>
+      <div class="compare-row"><span>Who</span><span class="compare-val">Companies</span></div>
+      <div class="compare-row"><span>Cost</span><span class="compare-val">$$$K</span></div>
+      <div class="compare-row"><span>Goal</span><span class="compare-val">Learn behaviour</span></div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-head">LoRA</div>
+      <div class="compare-row"><span>Who</span><span class="compare-val">Teams</span></div>
+      <div class="compare-row"><span>Cost</span><span class="compare-val">$$</span></div>
+      <div class="compare-row"><span>Goal</span><span class="compare-val">Domain expertise</span></div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-head">Prompting</div>
+      <div class="compare-row"><span>Who</span><span class="compare-val">You</span></div>
+      <div class="compare-row"><span>Cost</span><span class="compare-val">Free</span></div>
+      <div class="compare-row"><span>Goal</span><span class="compare-val">Control output</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: CONTEXT & MEMORY -->
+<div class="section" id="sec-context">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 5 — New Topic</div>
+    <div class="hero-title">Context Windows & Memory</div>
+    <div class="hero-sub">LLMs have no persistent memory between conversations. Everything they "know" about your session exists only in the current context window.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">Analogy</div>
+    <div class="analogy-text">Imagine a brilliant consultant who forgets everything the moment they leave your office. Each meeting, you hand them a printed transcript of all previous meetings. Their context window is how thick that stack of paper can be before they can't hold it all.</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num">4K</div><div class="stat-label">GPT-3 (2020)</div></div>
+    <div class="stat-card"><div class="stat-num">128K</div><div class="stat-label">GPT-4 Turbo</div></div>
+    <div class="stat-card"><div class="stat-num">1M+</div><div class="stat-label">Gemini 1.5 Pro</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Types of memory in AI systems</div>
+
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#EEEDFE; color:#3C3489;">1</div>
+    <div class="step-content">
+      <div class="step-title">In-context memory (short-term)</div>
+      <div class="step-desc">Everything in the current conversation window. Temporary. Disappears after the session ends. This is the only native memory an LLM has.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E1F5EE; color:#0F6E56;">2</div>
+    <div class="step-content">
+      <div class="step-title">External memory (vector databases)</div>
+      <div class="step-desc">Your documents, emails, or notes stored as "embeddings" (numerical representations) in a database. The AI retrieves relevant chunks when needed. This is the backbone of RAG systems.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#FAECE7; color:#712B13;">3</div>
+    <div class="step-content">
+      <div class="step-title">Parametric memory (baked-in knowledge)</div>
+      <div class="step-desc">Facts and patterns absorbed during pretraining. Distributed across billions of weights. Cannot be easily updated without retraining. Represents the model's "world knowledge" as of its training cutoff date.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E6F1FB; color:#0C447C;">4</div>
+    <div class="step-content">
+      <div class="step-title">Episodic memory (summaries & tools)</div>
+      <div class="step-desc">Some advanced applications store summaries of past conversations and inject them into new sessions, creating a simulated long-term memory. Powered by external databases, not the model itself.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="concept-card">
+    <div class="concept-title">Knowledge cutoff date</div>
+    <div class="concept-body">Pretraining data has a cutoff. A model trained on data up to early 2024 genuinely doesn't know about events after that. It's not being evasive — that information simply doesn't exist in its weights. This is why retrieval systems (RAG) and web search integrations matter so much.</div>
+  </div>
+
+  <button class="sendprompt-btn" onclick="sendPrompt('How do vector databases work and why are they important for LLM memory systems?')">How do vector databases work? ↗</button>
+</div>
+
+<!-- SECTION: RAG -->
+<div class="section" id="sec-rag">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 6</div>
+    <div class="hero-title">RAG — Retrieval-Augmented Generation</div>
+    <div class="hero-sub">Instead of relying on baked-in memory, RAG gives the LLM real-time access to your documents, databases, and live information.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">Analogy</div>
+    <div class="analogy-text">Imagine the difference between a closed-book exam (the model must remember everything from training) vs. an open-book exam (it can look up the exact relevant passage before answering). RAG is the open-book approach — more accurate, more trustworthy, more up-to-date.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">How RAG works — step by step</div>
+
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#EEEDFE; color:#3C3489;">1</div>
+    <div class="step-content">
+      <div class="step-title">Indexing (one-time setup)</div>
+      <div class="step-desc">Your documents are broken into chunks, converted into numerical vectors (embeddings), and stored in a vector database. Think of this as building a very smart index that understands meaning, not just keywords.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E1F5EE; color:#0F6E56;">2</div>
+    <div class="step-content">
+      <div class="step-title">Query encoding</div>
+      <div class="step-desc">When a user asks a question, that question is also converted into a vector. The system searches for document chunks whose vectors are mathematically "closest" to the question vector.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#FAECE7; color:#712B13;">3</div>
+    <div class="step-content">
+      <div class="step-title">Retrieval</div>
+      <div class="step-desc">The top matching chunks (say, 3–5 paragraphs) are retrieved from the database. These become the "reference material" the model will use.</div>
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E6F1FB; color:#0C447C;">4</div>
+    <div class="step-content">
+      <div class="step-title">Augmented generation</div>
+      <div class="step-desc">The retrieved chunks are placed directly into the prompt: "Given the following documents: [chunks]... answer this question: [user query]." The LLM then writes an answer grounded in those specific passages.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid-2">
+    <div class="concept-card">
+      <div class="concept-title">What RAG solves</div>
+      <div class="concept-body">Hallucinations about your private data. Outdated answers. The model making things up when it doesn't know. With RAG, the model is anchored to actual documents — it can even cite sources.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">What RAG doesn't solve</div>
+      <div class="concept-body">The model can still misinterpret a retrieved document. Poor chunking strategies can miss relevant content. If the retrieval step fails, the generation step has nothing good to work with.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-title">Embeddings — the magic behind retrieval</div>
+    <div class="concept-body">An embedding is a list of numbers (a vector) that represents the meaning of a piece of text. Two sentences that mean similar things will have vectors that are mathematically close together — even if they share no words. This is what allows semantic search: "car accident" and "vehicle collision" will retrieve the same documents even though the words differ.</div>
+  </div>
+
+  <button class="sendprompt-btn" onclick="sendPrompt('What is the difference between keyword search and vector/semantic search, with a simple example?')">Keyword vs semantic search? ↗</button>
+</div>
+
+<!-- SECTION: AGENTS & TOOLS -->
+<div class="section" id="sec-agents">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 7 — New Topic</div>
+    <div class="hero-title">Agents & Tool Use</div>
+    <div class="hero-sub">LLMs can be given tools — the ability to take actions in the world, not just generate text.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">Analogy</div>
+    <div class="analogy-text">Think of the difference between a brilliant advisor who can only talk to you, vs. one who can also search the web, run a spreadsheet, book a meeting, or call your team. Giving an LLM tools transforms it from a text generator into an agent that can act.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Common tools LLMs are given</div>
+
+  <div class="grid-2">
+    <div class="concept-card">
+      <div style="margin-bottom:6px;"><span class="tag tag-blue">Web search</span></div>
+      <div class="concept-body">Allows the model to retrieve current information from the internet, overcoming its training cutoff limitation.</div>
+    </div>
+    <div class="concept-card">
+      <div style="margin-bottom:6px;"><span class="tag tag-teal">Code execution</span></div>
+      <div class="concept-body">The model writes code and runs it in a sandboxed environment. Essential for data analysis, maths, and verifiable computation.</div>
+    </div>
+    <div class="concept-card">
+      <div style="margin-bottom:6px;"><span class="tag tag-purple">API calls</span></div>
+      <div class="concept-body">The model can query external services: weather data, stock prices, your CRM, your calendar — and incorporate the responses into its answers.</div>
+    </div>
+    <div class="concept-card">
+      <div style="margin-bottom:6px;"><span class="tag tag-coral">File operations</span></div>
+      <div class="concept-body">Reading documents, writing files, creating spreadsheets. Turning the LLM into a capable assistant that can interact with your working environment.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">The agent loop</div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#EEEDFE; color:#3C3489;">1</div>
+    <div class="step-content"><div class="step-title">Receive task</div><div class="step-desc">The user states a goal (e.g. "Research competitors and prepare a summary").</div></div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E1F5EE; color:#0F6E56;">2</div>
+    <div class="step-content"><div class="step-title">Plan</div><div class="step-desc">The model decides what steps are needed and which tools to use.</div></div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#FAECE7; color:#712B13;">3</div>
+    <div class="step-content"><div class="step-title">Act</div><div class="step-desc">The model calls a tool (e.g. web search), receives results, and incorporates them.</div></div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#E6F1FB; color:#0C447C;">4</div>
+    <div class="step-content"><div class="step-title">Observe & iterate</div><div class="step-desc">The model evaluates whether its goal is met. If not, it continues the loop — searching, computing, reasoning — until done.</div></div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="background:#FAEEDA; color:#633806;">5</div>
+    <div class="step-content"><div class="step-title">Respond</div><div class="step-desc">Final synthesised output is delivered to the user, along with reasoning or citations where appropriate.</div></div>
+  </div>
+
+  <div class="concept-card" style="margin-top:1rem;">
+    <div class="concept-title">Multi-agent systems</div>
+    <div class="concept-body">Advanced pipelines use multiple LLM agents collaborating: one agent researches, another writes, another reviews and critiques. This mirrors how human teams work — specialisation and review. Systems like AutoGPT and CrewAI are built on this principle.</div>
+  </div>
+
+  <button class="sendprompt-btn" onclick="sendPrompt('What are the main risks and failure modes in LLM agent systems?')">What can go wrong with agents? ↗</button>
+</div>
+
+<!-- SECTION: BIAS & ETHICS -->
+<div class="section" id="sec-ethics">
+  <div class="hero">
+    <div class="hero-eyebrow">Chapter 8 — New Topic</div>
+    <div class="hero-title">Bias, Ethics & Alignment</div>
+    <div class="hero-sub">LLMs inherit the biases of their training data — and making them safe, fair, and genuinely helpful is one of the hardest open problems in AI.</div>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">Analogy</div>
+    <div class="analogy-text">Imagine hiring a researcher who has read everything on the internet — including every piece of racism, misinformation, and toxic content ever published. Now you ask them to be your helpful, fair-minded assistant. Teaching them to unlearn those biases while keeping the useful knowledge? That's the alignment problem in a nutshell.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Sources of bias</div>
+
+  <div class="grid-2">
+    <div class="concept-card">
+      <div class="concept-title">Training data bias</div>
+      <div class="concept-body">The internet overrepresents English, Western perspectives, certain demographics, and certain viewpoints. Models trained on this data will reflect those skews in their outputs.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">Labeller bias</div>
+      <div class="concept-body">The humans who rank responses during RLHF bring their own cultural assumptions. "Helpful and harmless" is not culturally neutral — it means different things to different people.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">Recency bias</div>
+      <div class="concept-body">Recent documents are often over-represented in training data. Events and ideas from before the internet era are underweighted relative to their historical importance.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-title">Sycophancy</div>
+      <div class="concept-body">Models trained on human approval can learn to tell people what they want to hear rather than what's true. A form of bias toward agreement that RLHF can accidentally reinforce.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="font-size: 13px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">The alignment challenge</div>
+
+  <div class="concept-card">
+    <div class="concept-title">What is alignment?</div>
+    <div class="concept-body">Alignment means making a model's goals and behaviours match human values — not just following instructions, but doing so in ways that are genuinely beneficial, honest, and safe. It's hard because human values are complex, contextual, and often contradictory.</div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-title">Constitutional AI</div>
+    <div class="concept-body">An approach pioneered by Anthropic where the model is given a set of principles ("a constitution") and trained to critique and revise its own outputs against those principles. Less reliant on human labellers; more scalable.</div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-title">Red-teaming</div>
+    <div class="concept-body">Before release, models are stress-tested by teams trying to make them produce harmful, biased, or dangerous outputs. The discovered failures are used to improve safety training. An adversarial but necessary process.</div>
+  </div>
+
+  <button class="sendprompt-btn" onclick="sendPrompt('What does responsible AI deployment look like for a non-technical business leader?')">Responsible AI for business leaders ↗</button>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo && window.scrollTo(0, 0);
+}
+
+const colors = ['token-1','token-2','token-3','token-4','token-5'];
+function updateTokens() {
+  const val = document.getElementById('tokenInput').value;
+  const words = val.trim().split(/\s+/).filter(Boolean);
+  const tokens = [];
+  words.forEach(w => {
+    if (w.length > 8) { tokens.push(w.slice(0,Math.ceil(w.length/2))); tokens.push(w.slice(Math.ceil(w.length/2))); }
+    else tokens.push(w);
+  });
+  const display = document.getElementById('tokenDisplay');
+  display.innerHTML = tokens.map((t,i) => `<span class="token ${colors[i%5]}">${t}</span>`).join('');
+  document.getElementById('tokenCount').textContent = tokens.length + ' token' + (tokens.length !== 1 ? 's' : '') + ' estimated';
+}
+updateTokens();
+
+const tokenTypes = {
+  word: { title: 'Word-based tokenisation', body: 'Splits on spaces and punctuation. Simple and fast, but struggles with unknown or rare words. A new product name or technical jargon becomes a single "unknown" token. Used in older NLP systems. Example: "Let\'s go!" → ["Let\'s", "go", "!"]' },
+  char: { title: 'Character-based tokenisation', body: 'Every individual letter or symbol is a token. Extremely robust — any word can be represented. But sequences become very long, making it computationally expensive. The model must learn to group characters into meaning. Example: "Hi" → ["H", "i"]' },
+  sub: { title: 'Subword tokenisation (BPE / WordPiece)', body: 'The modern standard used by GPT-4, Claude, BERT, and others. Common words are kept whole; rare or complex words are split into meaningful subunits. Balances vocabulary size with coverage. Example: "unhappiness" → ["un", "happi", "ness"]. Crucially, the tokeniser learns these splits from data — frequent patterns stay merged, rare ones get split.' }
+};
+function showTokenType(type, btn) {
+  document.querySelectorAll('#tokenType .nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const t = tokenTypes[type];
+  document.getElementById('tokenTypeContent').innerHTML = `<div class="concept-title">${t.title}</div><div class="concept-body">${t.body}</div>`;
+}
+showTokenType('word', document.querySelector('#tokenType .nav-btn'));
+
+const probs = [
+  { word: 'blue', pct: 64, color: '#7F77DD' },
+  { word: 'clear', pct: 18, color: '#1D9E75' },
+  { word: 'grey', pct: 9, color: '#378ADD' },
+  { word: 'dark', pct: 5, color: '#D85A30' },
+  { word: 'beautiful', pct: 4, color: '#888780' },
+];
+document.getElementById('probBars').innerHTML = probs.map(p => `
+  <div class="prob-bar-wrap">
+    <span class="prob-word">${p.word}</span>
+    <div class="prob-bar-bg"><div class="prob-bar-fill" style="width:${p.pct}%; background:${p.color};"></div></div>
+    <span class="prob-pct">${p.pct}%</span>
+  </div>
+`).join('');
+
+const tempWords = [
+  { word: 'productive', safe: true }, { word: 'long', safe: true },
+  { word: 'intense', safe: false }, { word: 'surreal', safe: false },
+  { word: 'catastrophic', safe: false }, { word: 'dreamlike', safe: false },
+  { word: 'informative', safe: true }, { word: 'short', safe: true },
+];
+function updateTemp() {
+  const val = parseInt(document.getElementById('tempSlider').value);
+  const t = val / 10;
+  document.getElementById('tempVal').textContent = t.toFixed(1);
+  const container = document.getElementById('tempWords');
+  const desc = document.getElementById('tempDesc');
+  if (t < 0.4) {
+    const shown = tempWords.filter(w => w.safe);
+    container.innerHTML = shown.map(w => `<span class="temp-word" style="background:#EEEDFE;color:#3C3489;border-color:#AFA9EC;">${w.word}</span>`).join('');
+    desc.textContent = 'Low temperature: predictable, conservative. The model sticks to the most statistically likely words. Reliable, but can feel repetitive.';
+  } else if (t < 0.7) {
+    container.innerHTML = tempWords.map(w => `<span class="temp-word" style="background:${w.safe?'#E1F5EE':'#EEEDFE'};color:${w.safe?'#085041':'#3C3489'};border-color:${w.safe?'#5DCAA5':'#AFA9EC'};">${w.word}</span>`).join('');
+    desc.textContent = 'Medium temperature: balanced. Common and uncommon words both get a fair chance. Most real-world applications use this range (0.5–0.8).';
+  } else {
+    container.innerHTML = tempWords.map(w => `<span class="temp-word" style="background:${w.safe?'#FAEEDA':'#FAECE7'};color:${w.safe?'#633806':'#712B13'};border-color:${w.safe?'#EF9F27':'#F0997B'};">${w.word}</span>`).join('');
+    desc.textContent = 'High temperature: creative and unpredictable. Unusual word choices become much more likely. Great for creative writing, risky for factual tasks.';
+  }
+}
+updateTemp();
+</script>
