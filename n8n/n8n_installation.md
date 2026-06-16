@@ -29,7 +29,7 @@ Docker is the program that will run n8n on your computer. Think of it as a conta
 ## Step 2: Download the n8n Setup File
 
 You were provided a file called **`docker-compose.yml`**. This file tells Docker exactly how to set up n8n for you.
-
+[Click here to download the link](https://drive.google.com/file/d/1q6yTZ-ORbuW0Z3HGzC0Nn2p2ekPCWfPr/view?usp=drive_link)
 1. Create a new folder somewhere easy to find — for example, on your Desktop, name it `n8n`
 2. Place the `docker-compose.yml` file inside that folder
 3. Inside the same `n8n` folder, create another folder called `shared` (this is where you can put files you want to use inside n8n later)
@@ -46,6 +46,8 @@ n8n/
 
 ## Step 3: Open a Terminal (Command Prompt)
 
+
+**Note: Please turn off your anti virus before proceeding with this step, else it will block n8n from accessing your local host.**
 You'll need to type a couple of commands. Don't worry — there are only two!
 
 **On Windows:**
