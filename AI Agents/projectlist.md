@@ -9,6 +9,8 @@ Here's the rewritten list — this time each project has a concrete **MCP compon
 **New concepts taught:** how MCP actually works under the hood (tool discovery, schemas, transports — stdio vs SSE vs streamable HTTP), memory across sessions, human confirmation before risky actions.
 **Why it's in demand:** every company building an internal agent platform right now needs engineers who can wrap *their own* internal APIs as MCP servers, not just consume Gmail's.
 
+Link to project: https://github.com/Aditya-Johorey/personal-ops-agent-using-mcp
+
 ## 2. Agentic RAG Assistant Behind an MCP Interface (Easy–Medium)
 **Industry parallel:** legal/financial/medical research copilots
 **What they build:** An agentic RAG loop (retrieve → critique → reformulate → answer with citations) — then students **expose the whole RAG pipeline itself as an MCP server**, so any other agent or framework (CrewAI, Claude Agent SDK, etc.) can call it as a "research tool."
